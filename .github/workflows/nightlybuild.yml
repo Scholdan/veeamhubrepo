@@ -10,7 +10,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Get version
       run: "echo \"VEEAMHUBREPOVERSION=$(cat src/veeamhubrepo.py | grep -e  '# VEEAMHUBREPOVERSION:' | sed 's/# VEEAMHUBREPOVERSION: //;s/\\s*//g')\" >> $GITHUB_ENV"
@@ -35,7 +35,7 @@ jobs:
       run: find dist/ && find package/
       
     - name: Upload a deb
-      uses: actions/upload-artifact@v2.2.3
+      uses: actions/upload-artifact@v4
       with:
         name: "veeamhubrepo_noarch_${{env.VEEAMHUBREPOVERSION}}_nightly"
         path: "dist/*.deb"

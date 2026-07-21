@@ -1,6 +1,6 @@
 # VeeamHub Repo
 
-Experimental Python script to quickly setup an immutable repository. Initially made to quickly setup demo labs but feedback is appreciated. Tested only on Ubuntu 20.04 LTS (and this is the only target for this project until the next LTS).
+Experimental Python script to quickly setup an immutable repository. Initially made to quickly setup demo labs but feedback is appreciated. Tested on Ubuntu 24.04 LTS (the current target for this project).
 
 Check the release page to get debian package
 
@@ -12,7 +12,7 @@ sudo veeamhubrepo
 ```
 
 How it works:
-- Deploy Ubuntu 20.04 LTS on disk 1 (16GB is more then enough, you only need the base install)
+- Deploy Ubuntu 24.04 LTS on disk 1 (16GB is more then enough, you only need the base install)
 - Add a secondary repository disk/block device
 - Deploy Veeamhub Repo
 - Launch Veeamhub Repo

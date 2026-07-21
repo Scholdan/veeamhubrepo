@@ -57,14 +57,57 @@ def veeamreposshcheck(username):
     procs = [p for p in psutil.process_iter(['pid', 'name', 'username']) if username in p.username() and "ssh" in p.name()]
     return len(procs) > 0
 
-def getsshservice():
-    ssh = pystemd.systemd1.Unit(b'ssh.service')
-    ssh.load()
-    return ssh
+# Ubuntu 22.10+ (incl. 24.04) socket-activates SSH: the listening unit is
+# ssh.socket, and ssh.service only runs while a connection is open. So we drive
+# the socket (falling back to the service) and treat either being active as "on".
+_SSH_UNITS = (b'ssh.socket', b'ssh.service')
+
+def _ssh_unit(name):
+    u = pystemd.systemd1.Unit(name)
+    u.load()
+    return u
 
 def is_ssh_on():
-    s = getsshservice()
-    return s.Unit.ActiveState == b'active'
+    for name in _SSH_UNITS:
+        try:
+            if _ssh_unit(name).Unit.ActiveState == b'active':
+                return True
+        except Exception:
+            pass
+    return False
+
+def ssh_start():
+    # start the socket on socket-activated systems, else the plain service
+    for name in _SSH_UNITS:
+        try:
+            _ssh_unit(name).Unit.Start(b'replace')
+            return
+        except Exception:
+            continue
+
+def ssh_stop():
+    for name in _SSH_UNITS:
+        try:
+            u = _ssh_unit(name)
+            if u.Unit.ActiveState == b'active':
+                u.Unit.Stop(b'replace')
+        except Exception:
+            pass
+
+def ssh_stop_and_disable():
+    # stop, then persistently disable every SSH unit file present so SSH does
+    # not come back on reboot (ssh.socket + ssh.service + sshd.service alias)
+    ssh_stop()
+    mgr = pystemd.systemd1.Manager()
+    mgr.load()
+    wanted = ("ssh.socket", "ssh.service", "sshd.service")
+    for serv in mgr.Manager.ListUnitFiles():
+        base = serv[0].split(b'/')[-1]
+        if any(w == str(base, 'utf-8') for w in wanted):
+            try:
+                mgr.Manager.DisableUnitFiles([base], False)
+            except Exception:
+                pass
 
 def ufw_is_inactive():
 	ufw = subprocess.run(["ufw", "status"], capture_output=True)
