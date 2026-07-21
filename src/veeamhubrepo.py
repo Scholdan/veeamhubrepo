@@ -137,16 +137,11 @@ def formatdrive(config,d):
                 d.infobox(f"Now formating {part} with XFS")
                 #sometimes disk is not yet synced if too fast
                 time.sleep(2)
-                # size drives whether we set a large XFS log (safe only on big disks)
-                size_bytes = None
-                so = subprocess.run(["lsblk","-bdno","SIZE",part], capture_output=True)
-                if so.returncode == 0 and so.stdout.strip():
-                    size_bytes = int(so.stdout.split()[0])
-                pout = subprocess.run(diskcmd.mkfsxfs_cmd(part, size_bytes=size_bytes), capture_output=True)
+                pout = subprocess.run(diskcmd.mkfsxfs_cmd(part), capture_output=True)
                 if pout.returncode != 0:
                     force = d.yesno("mkfs.xfs failed, do you want me to try to force it?\n{0}".format(str(pout.stderr,'utf-8')),width=80)
                     if force == d.OK:
-                        pout = subprocess.run(diskcmd.mkfsxfs_cmd(part, force=True, size_bytes=size_bytes), capture_output=True)
+                        pout = subprocess.run(diskcmd.mkfsxfs_cmd(part, force=True), capture_output=True)
 
 
                 if pout.returncode != 0:
