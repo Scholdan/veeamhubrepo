@@ -77,13 +77,15 @@ def is_ssh_on():
     return False
 
 def ssh_start():
-    # start the socket on socket-activated systems, else the plain service
+    # start the socket on socket-activated systems, else the plain service.
+    # returns True if a unit actually started so callers don't assume success.
     for name in _SSH_UNITS:
         try:
             _ssh_unit(name).Unit.Start(b'replace')
-            return
+            return True
         except Exception:
             continue
+    return False
 
 def ssh_stop():
     for name in _SSH_UNITS:
