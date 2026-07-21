@@ -17,7 +17,7 @@ jobs:
       run: 'echo "${{env.VEEAMHUBREPOVERSION}} GA" > package/veeamhubrepo/usr/share/veeamhubrepo/release.txt'
 
     - name: Copy file
-      run: "cp src/*  package/veeamhubrepo/usr/share/veeamhubrepo"
+      run: "cp src/*  package/veeamhubrepo/usr/share/veeamhubrepo && rm -f package/veeamhubrepo/usr/share/veeamhubrepo/test_*.py"
       
     - name: Set version in package
       run: 'sed -i "s/Version: .*/Version: ${{env.VEEAMHUBREPOVERSION}}/" package/veeamhubrepo/DEBIAN/control'
