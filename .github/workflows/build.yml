@@ -33,7 +33,7 @@ jobs:
       run: find dist/ && find package/
       
     - name: Upload a deb
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v7
       with:
         name: "veeamhubrepo_noarch_${{env.VEEAMHUBREPOVERSION}}.deb"
         path: "dist/veeamhubrepo_noarch_${{env.VEEAMHUBREPOVERSION}}.deb"
